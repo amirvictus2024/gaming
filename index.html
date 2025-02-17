@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی ضربه</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: system-ui;
+        }
+        #target {
+            width: 100px;
+            height: 100px;
+            background-color: #0088cc;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #score {
+            position: fixed;
+            top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">امتیاز: 0</div>
+    <div id="target"></div>
+
+    <script>
+        let score = 0;
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const tg = window.Telegram.WebApp;
+        
+        function moveTarget() {
+            const maxX = window.innerWidth - 100;
+            const maxY = window.innerHeight - 100;
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+            target.style.left = newX + 'px';
+            target.style.top = newY + 'px';
+        }
+
+        target.addEventListener('click', () => {
+            score++;
+            scoreDisplay.textContent = `امتیاز: ${score}`;
+            moveTarget();
+            
+            // ارسال امتیاز به سرور
+            fetch('https://your-webapp-url.com/api/score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: tg.initDataUnsafe.user.id,
+                    points: 1
+                })
+            });
+        });
+
+        // شروع بازی
+        moveTarget();
+        tg.ready();
+        tg.expand();
+    </script>
+</body>
+</html>
